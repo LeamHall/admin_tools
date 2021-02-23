@@ -1,3 +1,7 @@
+# Avoid having personal notes made public.
+data/seed.list
+
+# Standard Perl stuff
 !Build/
 .last_cover_stats
 /META.yml

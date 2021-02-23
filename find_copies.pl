@@ -1,13 +1,11 @@
 #!/usr/bin/env perl
 
 # name:       find_copies.pl
-# version:    0.0.1
-# date:       20210217
+# version:    0.0.2
+# date:       20210223
 # desc:       Tool to help clean up old versions of files.
 
 ## TODO
-# Directory recursion.
-# - Use an array as a queue?
 
 use strict;
 use warnings;
@@ -17,6 +15,7 @@ use Getopt::Long;
 
 my %known_dirs;
 my %known_files;
+my @dir_queue;
 
 # Used to see how many copies we have.
 my $total_file_count  = 0;
@@ -55,13 +54,20 @@ sub build_exclude_list {
 }
 
 sub build_file_list {
-  foreach my $key ( keys(%known_dirs) ) {
-    opendir( my $dir, $key ) or die "Can't open $key: $!";
+  foreach my $search_dir ( @dir_queue ) {
+    opendir( my $dir, $search_dir ) or die "Can't open $search_dir: $!";
     foreach my $file ( readdir($dir)) {
-      next if -d "$key/$file";
-      $total_file_count++;
-      my $size = -s "$key/$file";
-      $known_files{$file}{$size} = 1;
+      next if $file =~ m/^\.\.?$/;
+      if ( -d "$search_dir/$file" ) {
+        next if ( defined ($exclude_dir{"$search_dir/$file"}) );
+        $known_dirs{"$search_dir/$file"} = 1;
+        push ( @dir_queue, "$search_dir/$file");
+      } else {
+        next if ( defined( $exclude_list{$file} ));
+        $total_file_count++;
+        my $size = -s "$search_dir/$file";
+        $known_files{$file}{$size} = 1;
+      }
     }
     closedir($dir);
   }
@@ -133,7 +139,7 @@ for my $line ( <$seed_data_file>) {
   chomp $line;
   my $dirname   = dirname($line);
   $known_dirs{$dirname} = 1 unless defined( $exclude_dir{$dirname} );
-  print "just added $dirname to known_dirs.\n";
+  push( @dir_queue, $dirname);
 }
 close $seed_data_file;
 

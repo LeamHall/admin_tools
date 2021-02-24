@@ -25,7 +25,7 @@ my $exclude_list_file;
 my %exclude_list;
 my $exclude_dir_file;
 my %exclude_dir;
-my $seed_file;     # This is just a seed file, the results of 'locate <filename>'
+my $seed_file;     # The results of 'locate <filename>'.
 
 sub usage {
   print "Usage: find_copies.pl --file <path/seed_file> [ --log | --exclude_list <file of files to not deal with> ] \n";

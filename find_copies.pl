@@ -20,15 +20,20 @@ my @dir_queue;
 # Used to see how many copies we have.
 my $total_file_count  = 0;
 my $actual_file_count = 0;
-my $log               = 0;     # set to 1 with the --log option.
+my $logdir;     
 my $exclude_list_file;
 my %exclude_list;
 my $exclude_dir_file;
 my %exclude_dir;
 my $seed_file;     # The results of 'locate <filename>'.
 
+my $output_dir;
+
+# Methods
 sub usage {
-  print "Usage: find_copies.pl --file <path/seed_file> [ --log | --exclude_list <file of files to not deal with> ] \n";
+  print "Usage: find_copies.pl --file <path/seed_file> \n";
+  print "  --logdir \n";
+  print "  --exclude_list <file of files to not deal with> \n";
   exit;
 };
 
@@ -73,8 +78,18 @@ sub build_file_list {
   }
 }
 
-sub show_log { 
-  print Dumper(%known_files);
+sub write_list_to_logfile {
+  my ( $list, $logfile ) = @_;
+  open my $file, '>', $logfile or die "Can't open $logfile: $!";
+  foreach my $line ( @$list ){
+    print $file "$line\n";
+  }
+  close $file;
+}
+
+sub write_log { 
+  my ( $dir ) = @_;
+  #print Dumper(%known_files);
   $actual_file_count = scalar(keys(%known_files));
   print "With $actual_file_count unique files, there are $total_file_count copies.\n";
   my @single_version_files;
@@ -90,42 +105,35 @@ sub show_log {
   @multiple_version_files  = sort(@multiple_version_files);
   @single_version_files    = sort(@single_version_files);
   if ( scalar( @multiple_version_files ) ) {
-    print "Files with multiple versions:\n";
-    foreach my $f ( @multiple_version_files ) {
-      print "\t $f \n";
-    }
+    my $mvf_filename = "$dir/multiple_version_files.list";
+    write_list_to_logfile(\@multiple_version_files, $mvf_filename);
   }
   if ( scalar( @single_version_files ) ){
-    print "Files with a single version:\n";
-    foreach my $f ( @single_version_files ) {
-      print "\t $f \n";
-    } 
+    my $svf_filename = "$dir/single_version_files.list";
+    write_list_to_logfile(\@single_version_files, $svf_filename);
   }
   if ( keys(%exclude_dir) ){
-    print "excluded directories:\n";
-    foreach my $dir ( keys(%exclude_dir) ){
-      print "\t $dir\n";
-    }
+    my @excluded_dirs = ( keys(%exclude_dir) );
+    my $excluded_dirs_filename = "$dir/excluded_dirs.list";
+    write_list_to_logfile(\@excluded_dirs, $excluded_dirs_filename);
   }
   if ( keys( %exclude_list ) ) {
-    print "excluded files:\n";
-    foreach my $file ( keys( %exclude_list ) ){
-      print "\t $file\n";
-    }
+    my @excluded_files = keys(%exclude_list);
+    my $excluded_files_filename = "$dir/excluded_files.list";
+    write_list_to_logfile(\@excluded_files, $excluded_files_filename);
   }
   if ( keys(%known_dirs) ) {
-    print "directory search list:\n";
-    foreach my $dir ( keys( %known_dirs )) {
-      print "\t $dir\n";
-    }
+    my @known_dirs = keys(%known_dirs);
+    my $known_dirs_filename = "$dir/known_dirs.list";
+    write_list_to_logfile(\@known_dirs, $known_dirs_filename);
   }
 }
 
 GetOptions(
-  "--log"             => \$log,
+  "--logdir=s"        => \$logdir,
   "--file=s"          => \$seed_file, 
-  "--exclude_files=s"  => \$exclude_list_file,
-  "--exclude_dirs=s"   => \$exclude_dir_file,
+  "--exclude_files=s" => \$exclude_list_file,
+  "--exclude_dirs=s"  => \$exclude_dir_file,
 );
 
 usage() unless ( defined($seed_file) );
@@ -144,6 +152,13 @@ for my $line ( <$seed_data_file>) {
 close $seed_data_file;
 
 build_file_list();
-show_log() if $log;
+
+if ( defined($logdir) ){
+  unless ( -d $logdir ) {
+    mkdir $logdir;
+  }
+  write_log($logdir);
+}
+
 
 

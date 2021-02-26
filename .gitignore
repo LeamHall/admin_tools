@@ -1,5 +1,6 @@
 # Avoid having personal notes made public.
 data/seed.list
+data/*
 
 # Standard Perl stuff
 !Build/

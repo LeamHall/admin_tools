@@ -1,11 +1,14 @@
 #!/usr/bin/env perl
 
 # name:       find_copies.pl
-# version:    0.0.2
-# date:       20210223
+# version:    0.0.3
+# date:       20210301
 # desc:       Tool to help clean up old versions of files.
 
 ## TODO
+#   Add a source directory for the "actual" files.
+#   Verify that excluding .git directories is the right choice.
+
 
 use strict;
 use warnings;
@@ -16,6 +19,8 @@ use Getopt::Long;
 my %known_dirs;
 my %known_files;
 my @dir_queue;
+my %source_files;
+my @source_dirs;
 
 # Used to see how many copies we have.
 my $total_file_count  = 0;
@@ -26,6 +31,7 @@ my %exclude_list;
 my $exclude_dir_file;
 my %exclude_dir;
 my $seed_file;     # The results of 'locate <filename>'.
+my $source_dir_file;
 
 my $output_dir;
 
@@ -58,11 +64,38 @@ sub build_exclude_list {
   close $exclude_files;
 }
 
+sub build_hash_true {
+  my $file = shift;
+  return unless defined $file;
+  my %return_hash;
+  open my $build_file, '<', $file or die "Can't open $file: $!";
+  foreach my $f ( <$build_file> ){
+    chomp $f;
+    $return_hash{$f} = 1;
+  }
+  close $build_file;
+  return \%return_hash;
+}
+
+sub build_list_from_file {
+  my $file = shift;
+  return unless defined $file;
+  my @return_array;
+  open my $build_file, '<', $file or die "Can't open $file: $!";
+  foreach my $f ( <$build_file> ){
+    chomp $f;
+    push( @return_array, $f );
+  }
+  close $build_file;
+  return \@return_array;
+}
+
 sub build_file_list {
   foreach my $search_dir ( @dir_queue ) {
     opendir( my $dir, $search_dir ) or die "Can't open $search_dir: $!";
     foreach my $file ( readdir($dir)) {
       next if $file =~ m/^\.\.?$/;
+      next if $file =~ m/^\.git$/;
       if ( -d "$search_dir/$file" ) {
         next if ( defined ($exclude_dir{"$search_dir/$file"}) );
         $known_dirs{"$search_dir/$file"} = 1;
@@ -131,12 +164,17 @@ sub write_log {
 
 GetOptions(
   "--logdir=s"        => \$logdir,
-  "--file=s"          => \$seed_file, 
+  #"--file=s"          => \$seed_file, 
   "--exclude_files=s" => \$exclude_list_file,
   "--exclude_dirs=s"  => \$exclude_dir_file,
+  "--source_dirs=s"   => \$source_dir_file,
+  "--seed_dirs=s"     => \$seed_file,
 );
 
 usage() unless ( defined($seed_file) );
+
+@source_dirs = build_list_from_file( $source_dir_file );
+
 open my $seed_data_file, '<', $seed_file or die "Can't open $seed_file: $!";
 
 build_exclude_list() if $exclude_list_file;

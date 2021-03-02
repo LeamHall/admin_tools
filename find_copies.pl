@@ -106,9 +106,11 @@ sub build_list_from_file {
 sub build_file_list {
   foreach my $search_dir ( @dir_queue ) {
     opendir( my $dir, $search_dir ) or die "Can't open $search_dir: $!";
+    #print "in build_file_list, search_dir is $search_dir.\n";
     foreach my $file ( readdir($dir)) {
-      next if $file =~ m/^\.\.?$/;
+      next if $file =~ m/^\.\.?\.?$/;
       next if $file =~ m/^\.git$/;
+      #print "in build_file_list, file is $file.\n";
       if ( -d "$search_dir/$file" ) {
         next if ( defined ($exclude_dir{"$search_dir/$file"}) );
         $known_dirs{"$search_dir/$file"} = 1;
@@ -196,13 +198,19 @@ build_exclude_dir() if $exclude_dir_file;
 # Build the list of directories to search.
 for my $line ( <$seed_data_file>) {
   chomp $line;
-  my $dirname   = dirname($line);
+  my $dirname;
+  if ( -f $line ) {
+    $dirname  = dirname($line);
+  } else {
+    $dirname  = $line;
+  }
+  print "in building list, dirname is $dirname.\n";
   $known_dirs{$dirname} = 1 unless defined( $exclude_dir{$dirname} );
   push( @dir_queue, $dirname);
 }
 close $seed_data_file;
 
-build_file_list();
+build_file_list(\@source_dirs);
 
 if ( defined($logdir) ){
   unless ( -d $logdir ) {

@@ -1,6 +1,7 @@
 # Avoid having personal notes made public.
 data/seed.list
 data/*
+*.swp
 
 # Standard Perl stuff
 !Build/

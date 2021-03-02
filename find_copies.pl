@@ -126,6 +126,23 @@ sub build_file_list {
   }
 }
 
+sub write_dirs_for_files {
+  #$known_files{$file}{$size}{$search_dir} = 1;
+  my ( $files )  = @_;
+  return unless defined( $files);
+  my %known_files = %{$files};
+  foreach my $file ( keys(%known_files)){
+    print "$file:\n";
+    foreach my $size ( keys( %{%known_files{$file}} )){
+      print "Size: $size\n";
+      foreach my $dir ( keys( %{%known_files{$file}{$size}}) ){
+        print "  $dir\n";
+      }
+    }
+  } 
+  print "\n";
+}
+
 sub write_list_to_logfile {
   my ( $list, $logfile ) = @_;
   open my $file, '>', $logfile or die "Can't open $logfile: $!";
@@ -204,7 +221,7 @@ for my $line ( <$seed_data_file>) {
   } else {
     $dirname  = $line;
   }
-  print "in building list, dirname is $dirname.\n";
+  #print "in building list, dirname is $dirname.\n";
   $known_dirs{$dirname} = 1 unless defined( $exclude_dir{$dirname} );
   push( @dir_queue, $dirname);
 }
@@ -220,4 +237,4 @@ if ( defined($logdir) ){
 }
 
 
-
+write_dirs_for_files(\%known_files);

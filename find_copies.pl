@@ -39,7 +39,7 @@ my $output_dir;
 sub usage {
   print "Usage: find_copies.pl --file <path/seed_file> \n";
   print "  --logdir \n";
-  print "  --exclude_list <file of files to not deal with> \n";
+  print "  --exclude_files <file of files to not deal with> \n";
   exit;
 };
 
@@ -77,6 +77,19 @@ sub build_hash_true {
   return \%return_hash;
 }
 
+sub build_hash_list {
+  my $file = shift;
+  return unless defined $file;
+  my %return_hash;
+  open my $build_file, '<', $file or die "Can't open $file: $!";
+  foreach my $f ( <$build_file> ){
+    chomp $f;
+    $return_hash{$f} = ();
+  }
+  close $build_file;
+  return \%return_hash;
+}
+
 sub build_list_from_file {
   my $file = shift;
   return unless defined $file;
@@ -104,7 +117,7 @@ sub build_file_list {
         next if ( defined( $exclude_list{$file} ));
         $total_file_count++;
         my $size = -s "$search_dir/$file";
-        $known_files{$file}{$size} = 1;
+        $known_files{$file}{$size}{$search_dir} = 1;
       }
     }
     closedir($dir);
@@ -122,7 +135,7 @@ sub write_list_to_logfile {
 
 sub write_log { 
   my ( $dir ) = @_;
-  #print Dumper(%known_files);
+  #print Dumper(\%known_files);
   $actual_file_count = scalar(keys(%known_files));
   print "With $actual_file_count unique files, there are $total_file_count copies.\n";
   my @single_version_files;
@@ -162,9 +175,9 @@ sub write_log {
   }
 }
 
+
 GetOptions(
   "--logdir=s"        => \$logdir,
-  #"--file=s"          => \$seed_file, 
   "--exclude_files=s" => \$exclude_list_file,
   "--exclude_dirs=s"  => \$exclude_dir_file,
   "--source_dirs=s"   => \$source_dir_file,

@@ -106,11 +106,9 @@ sub build_list_from_file {
 sub build_file_list {
   foreach my $search_dir ( @dir_queue ) {
     opendir( my $dir, $search_dir ) or die "Can't open $search_dir: $!";
-    #print "in build_file_list, search_dir is $search_dir.\n";
     foreach my $file ( readdir($dir)) {
       next if $file =~ m/^\.\.?\.?$/;
       next if $file =~ m/^\.git$/;
-      #print "in build_file_list, file is $file.\n";
       if ( -d "$search_dir/$file" ) {
         next if ( defined ($exclude_dir{"$search_dir/$file"}) );
         $known_dirs{"$search_dir/$file"} = 1;
@@ -127,16 +125,19 @@ sub build_file_list {
 }
 
 sub write_dirs_for_files {
-  #$known_files{$file}{$size}{$search_dir} = 1;
   my ( $files )  = @_;
   return unless defined( $files);
   my %known_files = %{$files};
+  
   foreach my $file ( keys(%known_files)){
-    print "$file:\n";
-    foreach my $size ( keys( %{%known_files{$file}} )){
-      print "Size: $size\n";
-      foreach my $dir ( keys( %{%known_files{$file}{$size}}) ){
-        print "  $dir\n";
+    foreach my $size ( keys( %{$known_files{$file}} )){
+      my $dir_count = keys %{$known_files{$file}{$size}};
+      if ( $dir_count > 1 ){
+        print "$file:    ";
+        print "Size: $size\n";
+        foreach my $dir ( keys( %{$known_files{$file}{$size}}) ){
+          print "  $dir\n";
+        }
       }
     }
   } 
@@ -221,7 +222,6 @@ for my $line ( <$seed_data_file>) {
   } else {
     $dirname  = $line;
   }
-  #print "in building list, dirname is $dirname.\n";
   $known_dirs{$dirname} = 1 unless defined( $exclude_dir{$dirname} );
   push( @dir_queue, $dirname);
 }

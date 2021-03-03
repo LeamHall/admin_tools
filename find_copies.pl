@@ -35,13 +35,6 @@ my $source_dir_file;
 
 my $output_dir;
 
-# Methods
-sub usage {
-  print "Usage: find_copies.pl --file <path/seed_file> \n";
-  print "  --logdir \n";
-  print "  --exclude_files <file of files to not deal with> \n";
-  exit;
-};
 
 # Pretty sure these could be made into one method.
 sub build_exclude_dir {
@@ -125,15 +118,18 @@ sub build_file_list {
 }
 
 sub write_dirs_for_files {
-  my ( $files )  = @_;
+  my ( $files, $logfile )  = @_;
   return unless defined( $files);
+  return unless defined( $logfile);
   my %known_files = %{$files};
-  
+ 
+  open my $log, '>', $logfile or die "Can't open $logfile: $!"; 
+  select $log;
   foreach my $file ( keys(%known_files)){
     foreach my $size ( keys( %{$known_files{$file}} )){
       my $dir_count = keys %{$known_files{$file}{$size}};
       if ( $dir_count > 1 ){
-        print "$file:    ";
+        print  "$file:    ";
         print "Size: $size\n";
         foreach my $dir ( keys( %{$known_files{$file}{$size}}) ){
           print "  $dir\n";
@@ -142,6 +138,7 @@ sub write_dirs_for_files {
     }
   } 
   print "\n";
+  close $logfile;
 }
 
 sub write_list_to_logfile {
@@ -196,12 +193,22 @@ sub write_log {
 }
 
 
+# Methods
+sub usage {
+  print "Usage: find_copies.pl --seed <path/seed_file>      \n";
+  print "  --logdir <directory to write log files>          \n";
+  print "  --exclude_files <file of files to not deal with> \n";
+  print "  --exclude_dirs  <file of directories to exclude> \n";
+  print "  --source_dirs   <list of original sources>       \n"; 
+  exit;
+};
+
 GetOptions(
   "--logdir=s"        => \$logdir,
   "--exclude_files=s" => \$exclude_list_file,
   "--exclude_dirs=s"  => \$exclude_dir_file,
   "--source_dirs=s"   => \$source_dir_file,
-  "--seed_dirs=s"     => \$seed_file,
+  "--seed=s"          => \$seed_file,
 );
 
 usage() unless ( defined($seed_file) );
@@ -236,5 +243,5 @@ if ( defined($logdir) ){
   write_log($logdir);
 }
 
-
-write_dirs_for_files(\%known_files);
+my $dirs_for_files_log = "$logdir/dirs_for_files.txt";
+write_dirs_for_files(\%known_files, $dirs_for_files_log);

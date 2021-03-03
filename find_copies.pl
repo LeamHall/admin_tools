@@ -25,11 +25,14 @@ my @source_dirs;
 # Used to see how many copies we have.
 my $total_file_count  = 0;
 my $actual_file_count = 0;
+my $purged_file_count = 0;
 my $logdir;     
 my $exclude_list_file;
 my %exclude_list;
 my $exclude_dir_file;
 my %exclude_dir;
+my $purge_file;
+my %purge_list;
 my $seed_file;     # The results of 'locate <filename>'.
 my $source_dir_file;
 
@@ -97,6 +100,8 @@ sub build_list_from_file {
 }
 
 sub build_file_list {
+  my ( %config ) = @_;
+  %purge_list = %{$config{purge_l}} if defined $config{purge_l};
   foreach my $search_dir ( @dir_queue ) {
     opendir( my $dir, $search_dir ) or die "Can't open $search_dir: $!";
     foreach my $file ( readdir($dir)) {
@@ -107,6 +112,11 @@ sub build_file_list {
         $known_dirs{"$search_dir/$file"} = 1;
         push ( @dir_queue, "$search_dir/$file");
       } else {
+        if ( defined( $purge_list{$file} )){
+          purge_file("$search_dir/$file");
+          $purged_file_count++;
+          next;
+        }
         next if ( defined( $exclude_list{$file} ));
         $total_file_count++;
         my $size = -s "$search_dir/$file";
@@ -115,6 +125,12 @@ sub build_file_list {
     }
     closedir($dir);
   }
+}
+
+sub purge_file {
+  my $file = shift;
+  return unless defined($file);
+  unlink($file) or die "Can't unlink $file: $!";
 }
 
 sub write_dirs_for_files {
@@ -200,6 +216,7 @@ sub usage {
   print "  --exclude_files <file of files to not deal with> \n";
   print "  --exclude_dirs  <file of directories to exclude> \n";
   print "  --source_dirs   <list of original sources>       \n"; 
+  print "  --purge         <file of files to remove>        \n";
   exit;
 };
 
@@ -207,6 +224,7 @@ GetOptions(
   "--logdir=s"        => \$logdir,
   "--exclude_files=s" => \$exclude_list_file,
   "--exclude_dirs=s"  => \$exclude_dir_file,
+  "--purge=s"         => \$purge_file,
   "--source_dirs=s"   => \$source_dir_file,
   "--seed=s"          => \$seed_file,
 );
@@ -216,6 +234,8 @@ usage() unless ( defined($seed_file) );
 @source_dirs = build_list_from_file( $source_dir_file );
 
 open my $seed_data_file, '<', $seed_file or die "Can't open $seed_file: $!";
+
+my $purge_list = build_hash_true($purge_file) if $purge_file;
 
 build_exclude_list() if $exclude_list_file;
 build_exclude_dir() if $exclude_dir_file;
@@ -234,7 +254,7 @@ for my $line ( <$seed_data_file>) {
 }
 close $seed_data_file;
 
-build_file_list(\@source_dirs);
+build_file_list( source_d => \@source_dirs , purge_l => $purge_list );
 
 if ( defined($logdir) ){
   unless ( -d $logdir ) {
@@ -245,3 +265,5 @@ if ( defined($logdir) ){
 
 my $dirs_for_files_log = "$logdir/dirs_for_files.txt";
 write_dirs_for_files(\%known_files, $dirs_for_files_log);
+
+print "Purged $purged_file_count files.\n" if $purged_file_count;

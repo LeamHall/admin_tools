@@ -244,7 +244,6 @@ build_exclude_dir() if $exclude_dir_file;
 
 # Build the list of directories to search.
 for my $line ( <$seed_data_file>) {
-  print "line is $line.\n";
   chomp $line;
   my $dirname;
   if ( -f $line ) {

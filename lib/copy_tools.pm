@@ -1,43 +1,13 @@
-#!/usr/bin/env perl
-
-# name:       find_copies.pl
-# version:    0.0.3
-# date:       20210301
-# desc:       Tool to help clean up old versions of files.
+# name:       copy_tools.pm
+# version:    0.0.1
+# date:       20210305
+# desc:       Methods for building data structures from files.
 
 ## TODO
-#   Add a source directory for the "actual" files.
-#   Verify that excluding .git directories is the right choice.
 
 
 use strict;
 use warnings;
-use File::Basename;
-use Data::Dumper;
-use Getopt::Long;
-
-my %known_dirs;
-my %known_files;
-my @dir_queue;
-my %source_files;
-my @source_dirs;
-
-# Used to see how many copies we have.
-my $total_file_count  = 0;
-my $actual_file_count = 0;
-my $purged_file_count = 0;
-my $logdir;     
-my $exclude_list_file;
-my %exclude_list;
-my $exclude_dir_file;
-my %exclude_dir;
-my $purge_file;
-my %purge_list;
-my $seed_file;     # The results of 'locate <filename>'.
-my $source_dir_file;
-
-my $output_dir;
-
 
 # Pretty sure these could be made into one method.
 sub build_exclude_dir {
@@ -210,66 +180,4 @@ sub write_log {
   }
 }
 
-
-# Methods
-sub usage {
-  print "Usage: find_copies.pl --seed <path/seed_file>      \n";
-  print "  --logdir <directory to write log files>          \n";
-  print "  --exclude_files <file of files to not deal with> \n";
-  print "  --exclude_dirs  <file of directories to exclude> \n";
-  print "  --source_dirs   <list of original sources>       \n"; 
-  print "  --purge         <file of files to remove>        \n";
-  exit;
-};
-
-GetOptions(
-  "--logdir=s"        => \$logdir,
-  "--exclude_files=s" => \$exclude_list_file,
-  "--exclude_dirs=s"  => \$exclude_dir_file,
-  "--purge=s"         => \$purge_file,
-  "--source_dirs=s"   => \$source_dir_file,
-  "--seed=s"          => \$seed_file,
-);
-
-usage() unless ( defined($seed_file) );
-
-@source_dirs = build_list_from_file( $source_dir_file );
-
-open my $seed_data_file, '<', $seed_file or die "Can't open $seed_file: $!";
-
-my $purge_list = build_hash_true($purge_file) if $purge_file;
-
-build_exclude_list() if $exclude_list_file;
-build_exclude_dir() if $exclude_dir_file;
-
-# Build the list of directories to search.
-for my $line ( <$seed_data_file>) {
-  print "line is $line.\n";
-  chomp $line;
-  my $dirname;
-  if ( -f $line ) {
-    $dirname  = dirname($line);
-  } else {
-    $dirname  = $line;
-  }
-  unless ( defined( $exclude_dir{$dirname} )) {
-    $known_dirs{$dirname} = 1;
-    push( @dir_queue, $dirname);
-  }
-}
-close $seed_data_file;
-
-build_file_list( dir_queue => \@dir_queue , purge_l => $purge_list );
-
-if ( defined($logdir) ){
-  unless ( -d $logdir ) {
-    mkdir $logdir;
-  }
-  write_log($logdir);
-}
-
-my $dirs_for_files_log = "$logdir/dirs_for_files.txt";
-write_dirs_for_files(\%known_files, $dirs_for_files_log);
-
-# For some reason this doesn't print, even when purging.
-print "Purged $purged_file_count files.\n" if $purged_file_count;
+1;

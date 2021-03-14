@@ -15,6 +15,8 @@ use warnings;
 use File::Basename;
 use Data::Dumper;
 use Getopt::Long;
+use lib "lib";
+use CopyTools;
 
 my %known_dirs;
 my %known_files;

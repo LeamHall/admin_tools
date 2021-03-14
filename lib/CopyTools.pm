@@ -1,13 +1,15 @@
-# name:       copy_tools.pm
+# name:       copytools.pm
 # version:    0.0.1
 # date:       20210305
 # desc:       Methods for building data structures from files.
 
 ## TODO
 
-
-use strict;
+use strict;;
 use warnings;
+
+package CopyTools;
+
 
 # Pretty sure these could be made into one method.
 sub build_exclude_dir {

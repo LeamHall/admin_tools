@@ -171,8 +171,8 @@ sub write_list_to_logfile {
 sub write_log { 
   my ( $dir ) = @_;
   #print Dumper(\%known_files);
-  $actual_file_count = scalar(keys(%known_files));
-  print "With $actual_file_count unique files, there are $total_file_count copies.\n";
+  #$actual_file_count = scalar(keys(%known_files));
+  #print "With $actual_file_count unique files, there are $total_file_count copies.\n";
   my @single_version_files;
   my @multiple_version_files;
   foreach my $file ( keys( %known_files ) ){
@@ -260,15 +260,15 @@ close $seed_data_file;
 
 build_file_list( dir_queue => \@dir_queue , purge_l => $purge_list );
 
-if ( defined($logdir) ){
-  unless ( -d $logdir ) {
-    mkdir $logdir;
-  }
+if ( defined($logdir) and -d $logdir ){
   write_log($logdir);
+  my $dirs_for_files_log = "$logdir/dirs_for_files.txt";
+  write_dirs_for_files(\%known_files, $dirs_for_files_log);
+} else {
+  $actual_file_count = scalar(keys(%known_files));
+  print "With $actual_file_count unique files, there are $total_file_count copies.\n";
 }
-
-my $dirs_for_files_log = "$logdir/dirs_for_files.txt";
-write_dirs_for_files(\%known_files, $dirs_for_files_log);
 
 # For some reason this doesn't print, even when purging.
 print "Purged $purged_file_count files.\n" if $purged_file_count;
+

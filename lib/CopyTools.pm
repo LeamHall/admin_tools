@@ -1,16 +1,23 @@
-# name:       copy_tools.pm
+# name:       copytools.pm
 # version:    0.0.1
 # date:       20210305
 # desc:       Methods for building data structures from files.
 
 ## TODO
 
-
-use strict;
+use strict;;
 use warnings;
+
+package CopyTools;
+
 
 # Pretty sure these could be made into one method.
 sub build_exclude_dir {
+  my ($exclude_dir_file, $exclude_dir_ref)  = @_;
+  return unless defined $exclude_dir_file;
+  return unless defined $exclude_dir_ref;
+  my %exclude_dir = %{$exclude_dir_ref};
+
   open my $exclude_dirs, '<', $exclude_dir_file or die "Can't open $exclude_dir_file: $!";
   for my $dir ( <$exclude_dirs> ) { 
     chomp $dir;
@@ -19,15 +26,22 @@ sub build_exclude_dir {
     }
   }
   close $exclude_dirs;
+  return ~\%exclude_dir;
 }
 
 sub build_exclude_list {
+  my ( $exclude_list_file, $exclude_list_ref) = @_;
+  return unless defined $exclude_list_file;
+  return unless defined $exclude_list_ref;
+  my %exclude_list = %{$exclude_list_ref};
+
   open my $exclude_files, '<', $exclude_list_file or die "Can't open $exclude_list_file: $!";
   for my $file ( <$exclude_files> ) {
     chomp $file;
     $exclude_list{$file} = 1;
   }
   close $exclude_files;
+  return \%exclude_list;
 }
 
 sub build_hash_true {
@@ -71,9 +85,15 @@ sub build_list_from_file {
 
 sub build_file_list {
   my ( %config ) = @_;
-  my @dir_queue = @{$config{dir_queue}} if defined $config{dir_queue};
-  scalar( @dir_queue ) or die "No dir_queue: #!";
-  %purge_list = %{$config{purge_l}} if defined $config{purge_l};
+  return unless defined $config{dir_queue};
+  return unless defined $config{known_files};
+  return unless defined $config{known_dirs};
+  my @dir_queue     = @{$config{dir_queue}};
+  my %purge_list    = %{$config{purge_l}} if defined $config{purge_l};
+  my %exclude_dir   = %{$config{exclude_dir}} if defined $config{exclude_dir};
+  my %exclude_list  = %{$config{exclude_list}} if defined $config{exclude_list};
+  my %known_files   = %{$config{known_files}} if defined $config{known_files};
+  my %known_dirs    = %{$config{known_dirs}} if defined $config{known_dirs};
   foreach my $search_dir ( @dir_queue ) {
     opendir( my $dir, $search_dir ) or die "Can't open $search_dir: $!";
     foreach my $file ( readdir($dir)) {
@@ -86,17 +106,18 @@ sub build_file_list {
       } else {
         if ( defined( $purge_list{$file} )){
           purge_file("$search_dir/$file");
-          $purged_file_count++;
+          #$purged_file_count++;
           next;
         }
         next if ( defined( $exclude_list{$file} ));
-        $total_file_count++;
+        #$total_file_count++;
         my $size = -s "$search_dir/$file";
         $known_files{$file}{$size}{$search_dir} = 1;
       }
     }
     closedir($dir);
   }
+  return \%known_files;
 }
 
 sub purge_file {
@@ -139,9 +160,15 @@ sub write_list_to_logfile {
 }
 
 sub write_log { 
-  my ( $dir ) = @_;
-  #print Dumper(\%known_files);
-  $actual_file_count = scalar(keys(%known_files));
+  my ( $dir, $total_file_count, $known_files, $known_dirs, $exclude_list, $exclude_dir ) = @_;
+  return unless defined $dir;
+  return unless defined $known_files;
+  return unless defined $known_dirs;
+  my %known_files   = %{$known_files};
+  my %known_dirs    = %{$known_dirs};
+  my %exclude_list  = %{$exclude_list} if defined $exclude_list;
+  my %exclude_dir   = %{$exclude_dir} if defined $exclude_dir;
+  my $actual_file_count = scalar(keys(%known_files));
   print "With $actual_file_count unique files, there are $total_file_count copies.\n";
   my @single_version_files;
   my @multiple_version_files;

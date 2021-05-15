@@ -34,8 +34,9 @@
 import os
 import sys
 
-# Using 'docs2/' while I test.
-docs_dir  = 'docs2/'
+# Github pages can use 'docs/' as a document root.
+# This lets us keep the parts and base pages in the repo, but not seen.
+docs_dir  = 'docs/'
 if not os.path.isdir(docs_dir):
   os.makedirs(docs_dir)
 

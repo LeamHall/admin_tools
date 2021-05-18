@@ -68,7 +68,6 @@ named_dirs = dict()
 for root,dirs,files in os.walk('base_pages/'):
   short_root = root[len('base_pages/'):]
   for name in files:
-    print(name)
     if name.endswith('.swp'):
       continue
     if len(short_root) == 0: 

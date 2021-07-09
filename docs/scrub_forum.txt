@@ -1,0 +1,9 @@
+1. Save the files as html pages.
+  - Find the script I used to slurp them.
+
+2. Open the page in a web browser.
+  - ^A, ^C to copy all
+
+3. Paste into a vim based file.
+
+4. Run scrub_coti.pl on the txt file.

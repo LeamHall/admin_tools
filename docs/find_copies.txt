@@ -1,0 +1,79 @@
+Finding and Purging old file copies
+===================================
+
+
+Workflow
+========
+
+With any external backup drives connected, update the file location 
+  (mlocate) database. This must be done as root or with sudo.
+
+  # updatedb
+
+
+Create a data and log directory. The names are up to you, but they are used
+  in the command line options.
+
+  mkdir {data,logs}
+
+
+Pick a few known duplicated file names. Use "locate" to create a seed file.
+
+  locate -i my_cool_file.docx > data/seed.list
+  locate -i my_other_file.docx >> data/seed.list
+
+
+Run the command and get an idea of the scope of the task.
+
+  ./find_copies.pl --seed data/seed.list
+  With 36 unique files, there are 1332 copies.
+
+
+If you want more detail, write the logs.
+
+  ./find_copies.pl --seed data/seed.list --logdir logs
+
+
+There will be a few files in the logs directory, based on what files
+  are found:
+
+  single_version_files.list
+    A list of files where each one has the exact same size. They may
+    be different files but they have the same byte count.
+
+  multiple_version_files.list
+    A list of files that have more than one version, based on size.
+
+  known_dirs.list
+    The list of directories that were searched. Does not include
+    any excluded dirs.
+
+  excluded_dirs.list
+    If you excluded any directories, they will be listed here.
+
+  excluded_files.list
+    If you excluded any files, they will be listed here. 
+
+  
+
+
+Purging files
+=============
+
+Create a list of files you want to purge.
+
+  vi data/purge.list
+
+
+Run the command with the --purge option.
+
+  ./find_copies.pl --seed data/seed.list --logdir logs --purge data/purge.list
+
+
+When the command completes, update the mlocate database and verify the file
+  is gone.
+
+  # updatedb
+  $ locate my_cool_file.docx
+
+

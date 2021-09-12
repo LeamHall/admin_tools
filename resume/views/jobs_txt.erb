@@ -1,0 +1,6 @@
+<% @job_list.each do |job| %>
+<% "#{job.title}: #{job.employer} (#{job.start_date} - #{job.end_date})" %>
+<%= if @length == "long" -%>
+<% "#{job.blurb}" %>
+<% end %>
+<% end %>

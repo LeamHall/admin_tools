@@ -1,0 +1,14 @@
+
+
+<% @job_list.each do |job| %>
+  <% if @mode == "txt" %>
+<%= "#{job.title}: #{job.employer} (#{job.start_date} - #{job.end_date})" %>
+  <% elsif @mode == "html" %>
+<%= "<p><b>#{job.title}</b>: #{job.employer} (#{job.start_date} - #{job.end_date})</p><p>" %>
+  <% end %>
+  <% if @length == "long" %>
+<%= "#{job.blurb}" %>
+  <% end %>
+<% end %>
+
+<% 

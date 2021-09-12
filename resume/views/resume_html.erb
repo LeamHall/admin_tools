@@ -1,0 +1,23 @@
+
+
+<html>
+  <head>
+    <title><%= @resume.contact.name %></title>
+  </head>
+
+  <body>
+
+<% @resume.jobs.keys.each do |key| %>
+
+<p><b><%= @resume.jobs[key].title %></b> <%= @resume.jobs[key].employer %>
+  ( <%= @resume.jobs[key].start_date %> - <%= @resume.jobs[key].end_date %> )
+<p>
+<%= @resume.jobs[key].blurb if length == 'long' %>
+  <% if length == 'long' %>
+   <br> 
+   <br>
+  <%end %>
+<% end %>
+
+  </body>
+</html>

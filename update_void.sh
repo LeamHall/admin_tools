@@ -18,6 +18,10 @@ sleep 10
 # Removes old packages that are no longer needed.
 xbps-remove -O
 
+# updates the CA certificates
+update-ca-certificates
+
 # Updates the locate db.
 updatedb
+
 

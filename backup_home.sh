@@ -21,4 +21,14 @@ then
   rsync -av /home/  /opt/external/home
 fi
 
+# Externals need a config option.
+if [ ! -d /opt/external2/home ]
+then
+  mount /opt/external2
+fi
+
+if [ -d /opt/external2/home ]
+then
+  rsync -av /home/  /opt/external2/home
+fi
 

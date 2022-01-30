@@ -1,10 +1,14 @@
 #!/bin/bash
 
-# name: 	update_void.sh
-# version:	0.0.1
-# date:		20211101
-# author:	Leam Hall
-# desc:		Package update and clean-up for Void system.
+# name: 	  update_void.sh
+# version:	0.0.2
+# date:		  20220130
+# author:	  Leam Hall
+# desc:		  Package update and clean-up for Void system.
+
+# CHANGELOG:
+#   20220130  Added, and fixed, the test for xbps-install failure.
+
 
 date=`date +%Y%m%d`
 logfile="/var/log/xbps/update_${date}.log"
@@ -12,18 +16,16 @@ logfile="/var/log/xbps/update_${date}.log"
 # Removes old kernels.
 #vkpurge rm all > $logfile 2>&1
 
-# Updates, and keeps a log.
+# Updates, and keeps a log. Whines on failure.
 xbps-install -Suvy >> $logfile 2>&1
-
-# This isn't working right, it always exits, even on a 0.
-#if [ $? > 0 ]
-#then
-#  echo "ERROR: Package update failed"
-#  exit 1
-#fi
+if [ "$?" -ne 0 ]
+then
+  echo "ERROR: Package update failed"
+  exit 1
+fi
 
 # Lets the system quiesce.
-sleep 10
+sleep 5
 
 # Removes old packages that are no longer needed.
 xbps-remove -O >> $logfile 2>&1

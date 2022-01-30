@@ -6,22 +6,32 @@
 # author:	Leam Hall
 # desc:		Package update and clean-up for Void system.
 
+date=`date +%Y%m%d`
+logfile="/var/log/xbps/update_${date}.log"
+
 # Removes old kernels.
-vkpurge rm all
+#vkpurge rm all > $logfile 2>&1
 
 # Updates, and keeps a log.
-xbps-install -Suvy > /var/tmp/xbps-install_Suvy_`date +%Y%m%d`.log 2>&1
+xbps-install -Suvy >> $logfile 2>&1
+if [ $? > 0 ]
+then
+  echo "ERROR: Package update failed (again)"
+  exit 1
+fi
 
 # Lets the system quiesce.
 sleep 10
 
 # Removes old packages that are no longer needed.
-xbps-remove -O
+xbps-remove -O >> $logfile 2>&1
 
 # updates the CA certificates
-update-ca-certificates
+update-ca-certificates >> $logfile 2>&1
 
 # Updates the locate db.
-updatedb
+updatedb >> $logfile 2>&1
 
+# Forces a package reconfigure 
+xbps-reconfigure -fa
 

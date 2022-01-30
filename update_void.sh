@@ -14,11 +14,13 @@ logfile="/var/log/xbps/update_${date}.log"
 
 # Updates, and keeps a log.
 xbps-install -Suvy >> $logfile 2>&1
-if [ $? > 0 ]
-then
-  echo "ERROR: Package update failed (again)"
-  exit 1
-fi
+
+# This isn't working right, it always exits, even on a 0.
+#if [ $? > 0 ]
+#then
+#  echo "ERROR: Package update failed"
+#  exit 1
+#fi
 
 # Lets the system quiesce.
 sleep 10
@@ -33,5 +35,5 @@ update-ca-certificates >> $logfile 2>&1
 updatedb >> $logfile 2>&1
 
 # Forces a package reconfigure 
-xbps-reconfigure -fa
+xbps-reconfigure -fa >> $logfile 2>&1
 

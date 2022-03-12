@@ -39,3 +39,7 @@ updatedb >> $logfile 2>&1
 # Forces a package reconfigure 
 xbps-reconfigure -fa >> $logfile 2>&1
 
+# Check log for issues
+echo "Checking log"
+egrep -i "^warning|^error|^fail" $logfile
+echo "Done"

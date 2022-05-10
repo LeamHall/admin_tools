@@ -13,6 +13,9 @@
 #   Add statistical analysis for standard deviation.
 #   Report based on time of day (early, midmorning, afternoon, evening)
 #   (?) Add current distance from goal?
+#   Error checking for input. Three ints?
+#   Add tests.
+
 
 import argparse
 from datetime import datetime
@@ -26,8 +29,6 @@ def array_from_file(report_file):
       datum = line.split()
       if len(datum) == 4:
         data.append(datum)
-      else:
-        continue
   return data
  
 def report(report_data):
@@ -51,14 +52,13 @@ def report(report_data):
       highest_pulse_event = datum
     if date > latest:
       latest_record = datum
+  return highest_systolic_event, highest_diastolic_event, highest_pulse_event, latest_record
 
+def print_report(highest_systolic_event, highest_diastolic_event, highest_pulse_event, latest_record):
   print("Highest Systolic: {}/{} {} {}".format(*highest_systolic_event))
   print("Highest Diastolic: {}/{} {} {}".format(*highest_diastolic_event))
   print("Highest Pulse: {}/{} {} {}".format(*highest_pulse_event))
   print("Latest Record: {}/{} {} {}".format(*latest_record))
-
-def result_string(report_list):
-  return "{} {} {} {}".format(*report_list)
 
 
 report_file = "bp_numbers.txt" 
@@ -78,15 +78,16 @@ if args.add:
   this_report = args.add
   this_report.append(timestamp) 
   with open(report_file, 'a') as file:
-    file.write(result_string(this_report) + "\n")
+    file.write("{} {} {} {}\n".format(*this_report))
 else: 
   # Default behavior is to report.
   if os.path.exists(report_file):
     try:
       report_data = array_from_file(report_file)
-      report(report_data)
-    except:
-      print("Error processing report data")
+      highest_systolic, highest_diastolic, highest_pulse, latest = report(report_data)
+      print_report(highest_systolic, highest_diastolic, highest_pulse, latest)
+    except Exception as e:
+      print("Error processing report data", e)
   else:
     print("Cannot find ", report_file)
  

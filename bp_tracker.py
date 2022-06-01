@@ -60,6 +60,28 @@ def print_report(highest_systolic_event, highest_diastolic_event, highest_pulse_
   print("Highest Pulse: {}/{} {} {}".format(*highest_pulse_event))
   print("Latest Record: {}/{} {} {}".format(*latest_record))
 
+def list_collations(report_data):
+  """ Takes a data set and returns a tuple of three lists. """
+  systolics   = []
+  diastolics  = []
+  pulses      = []
+
+  for datum in report_data:
+    systolics.append(int(datum[0]))
+    diastolics.append(int(datum[1]))
+    pulses.append(int(datum[2]))
+
+  return systolics, diastolics, pulses
+
+
+def list_average(l):
+  """ Takes a numeric list and returns an integer. """
+  average = sum(l) // len(l)
+  return average
+
+def list_high_low(l):
+  """ Takes a numeric list and returns the highest and lowest entries. """
+  return (min(l), max(l))
 
 report_file = "bp_numbers.txt" 
 
@@ -84,8 +106,17 @@ else:
   if os.path.exists(report_file):
     try:
       report_data = array_from_file(report_file)
-      highest_systolic, highest_diastolic, highest_pulse, latest = report(report_data)
-      print_report(highest_systolic, highest_diastolic, highest_pulse, latest)
+      systolics, diastolics, pulses  = list_collations(report_data)
+      print("Systolic: Average {}, Low {}, High {}".format(
+        list_average(systolics),  
+        list_high_low(systolics)[0],
+        list_high_low(systolics)[1],
+      ))
+      print("Diastolic: Average {}, Low {}, High {}".format(
+        list_average(diastolics),  
+        list_high_low(diastolics)[0],
+        list_high_low(diastolics)[1],
+      ))
     except Exception as e:
       print("Error processing report data", e)
   else:

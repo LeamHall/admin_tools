@@ -16,10 +16,32 @@
 #   Error checking for input. Three ints?
 #   Add tests.
 
+"""
+Usage:
+    ./bp_tracker.py [-f <report_file>] -a systolic diastolic pulse
+
+Options:
+    -a --add <sys> <diasys> <pulse>
+                Add three items of data: systolic & diastolic BP and
+                pulse rate. A mandatory option.
+    -f --file <report_file>   name of data file 
+                Modify code prn for specific users.
+                                [default: bp_numbers.txt]
+"""
 
 import argparse
 from datetime import datetime
 import os.path
+import os
+
+user = os.getlogin()
+if user == 'leam':
+    REPORT_FILE = 'bp_numbers.txt'
+elif user == 'alex':
+    REPORT_FILE = "/home/alex/Git/LH/Data/bp_numbers.txt" 
+else:
+    REPORT_FILE = 'bp_numbers.txt'
+
 
 def array_from_file(report_file):
   data = []
@@ -83,43 +105,46 @@ def list_high_low(l):
   """ Takes a numeric list and returns the highest and lowest entries. """
   return (min(l), max(l))
 
-report_file = "bp_numbers.txt" 
 
-parser = argparse.ArgumentParser()
-parser.add_argument("-a", "--add", nargs=3, 
-  help = "Add in the order of systolic, diastolic, pulse")
-parser.add_argument("-f", "--file", help = "Report file")
-args    = parser.parse_args()
+if __name__ == '__main__':
 
-if args.file:
-  report_file = args.file
+    report_file = REPORT_FILE
 
-if args.add:
-  # This format allows sequencing now and parsing later.
-  timestamp   = datetime.now().strftime("%Y%m%d.%H%M")
-  this_report = args.add
-  this_report.append(timestamp) 
-  with open(report_file, 'a') as file:
-    file.write("{} {} {} {}\n".format(*this_report))
-else: 
-  # Default behavior is to report.
-  if os.path.exists(report_file):
-    try:
-      report_data = array_from_file(report_file)
-      systolics, diastolics, pulses  = list_collations(report_data)
-      print("Systolic: Average {}, Low {}, High {}".format(
-        list_average(systolics),  
-        list_high_low(systolics)[0],
-        list_high_low(systolics)[1],
-      ))
-      print("Diastolic: Average {}, Low {}, High {}".format(
-        list_average(diastolics),  
-        list_high_low(diastolics)[0],
-        list_high_low(diastolics)[1],
-      ))
-    except Exception as e:
-      print("Error processing report data", e)
-  else:
-    print("Cannot find ", report_file)
- 
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-a", "--add", nargs=3, 
+      help = "Add in the order of systolic, diastolic, pulse")
+    parser.add_argument("-f", "--file", help = "Report file")
+    args    = parser.parse_args()
+
+    if args.file:
+      report_file = args.file
+
+    if args.add:
+      # This format allows sequencing now and parsing later.
+      timestamp   = datetime.now().strftime("%Y%m%d.%H%M")
+      this_report = args.add
+      this_report.append(timestamp) 
+      with open(report_file, 'a') as file:
+        file.write("{} {} {} {}\n".format(*this_report))
+    else: 
+      # Default behavior is to report.
+      if os.path.exists(report_file):
+        try:
+          report_data = array_from_file(report_file)
+          systolics, diastolics, pulses  = list_collations(report_data)
+          print("Systolic: Average {}, Low {}, High {}".format(
+            list_average(systolics),  
+            list_high_low(systolics)[0],
+            list_high_low(systolics)[1],
+          ))
+          print("Diastolic: Average {}, Low {}, High {}".format(
+            list_average(diastolics),  
+            list_high_low(diastolics)[0],
+            list_high_low(diastolics)[1],
+          ))
+        except Exception as e:
+          print("Error processing report data", e)
+      else:
+        print("Cannot find ", report_file)
+     
 

@@ -15,10 +15,12 @@
 #   (?) Add current distance from goal?
 #   Error checking for input. Three ints?
 #   Add tests.
+#   Add mechanism (envvar, config file, ...) to set default data file
 
 """
 Usage:
     ./bp_tracker.py [-f <report_file>] -a systolic diastolic pulse
+    ./bp_tracker.py -h
 
 Options:
     -a --add <sys> <diasys> <pulse>
@@ -32,15 +34,8 @@ Options:
 import argparse
 from datetime import datetime
 import os.path
-import os
 
-user = os.getlogin()
-if user == 'leam':
-    REPORT_FILE = 'bp_numbers.txt'
-elif user == 'alex':
-    REPORT_FILE = "/home/alex/Git/LH/Data/bp_numbers.txt" 
-else:
-    REPORT_FILE = 'bp_numbers.txt'
+REPORT_FILE = 'bp_numbers.txt'
 
 
 def array_from_file(report_file):

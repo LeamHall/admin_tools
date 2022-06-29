@@ -99,47 +99,50 @@ def list_average(l):
 def list_high_low(l):
   """ Takes a numeric list and returns the highest and lowest entries. """
   return (min(l), max(l))
+report_file = "data/bp_numbers.txt"
 
+parser = argparse.ArgumentParser()
+parser.add_argument(
+  "-a", "--add",
+  nargs=3,
+  help = "Add in the order of systolic, diastolic, pulse",
+  )
+parser.add_argument(
+  "-f", "--file",
+  help = "Report file (default data/bp_numbers.txt)",
+  default = "data/bp_numbers.txt",
+  )
+args    = parser.parse_args()
 
-if __name__ == '__main__':
+if args.file:
+  report_file = args.file
 
-    report_file = REPORT_FILE
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-a", "--add", nargs=3, 
-      help = "Add in the order of systolic, diastolic, pulse")
-    parser.add_argument("-f", "--file", help = "Report file")
-    args    = parser.parse_args()
-
-    if args.file:
-      report_file = args.file
-
-    if args.add:
-      # This format allows sequencing now and parsing later.
-      timestamp   = datetime.now().strftime("%Y%m%d.%H%M")
-      this_report = args.add
-      this_report.append(timestamp) 
-      with open(report_file, 'a') as file:
-        file.write("{} {} {} {}\n".format(*this_report))
-    else: 
-      # Default behavior is to report.
-      if os.path.exists(report_file):
-        try:
-          report_data = array_from_file(report_file)
-          systolics, diastolics, pulses  = list_collations(report_data)
-          print("Systolic: Average {}, Low {}, High {}".format(
-            list_average(systolics),  
-            list_high_low(systolics)[0],
-            list_high_low(systolics)[1],
-          ))
-          print("Diastolic: Average {}, Low {}, High {}".format(
-            list_average(diastolics),  
-            list_high_low(diastolics)[0],
-            list_high_low(diastolics)[1],
-          ))
-        except Exception as e:
-          print("Error processing report data", e)
-      else:
-        print("Cannot find ", report_file)
-     
+if args.add:
+  # This format allows sequencing now and parsing later.
+  timestamp   = datetime.now().strftime("%Y%m%d.%H%M")
+  this_report = args.add
+  this_report.append(timestamp) 
+  with open(report_file, 'a') as file:
+    file.write("{} {} {} {}\n".format(*this_report))
+else: 
+  # Default behavior is to report.
+  if os.path.exists(report_file):
+    try:
+      report_data = array_from_file(report_file)
+      systolics, diastolics, pulses  = list_collations(report_data)
+      print("Systolic: Average {}, Low {}, High {}".format(
+        list_average(systolics),  
+        list_high_low(systolics)[0],
+        list_high_low(systolics)[1],
+      ))
+      print("Diastolic: Average {}, Low {}, High {}".format(
+        list_average(diastolics),  
+        list_high_low(diastolics)[0],
+        list_high_low(diastolics)[1],
+      ))
+    except Exception as e:
+      print("Error processing report data", e)
+  else:
+    print("Cannot find ", report_file)
+ 
 

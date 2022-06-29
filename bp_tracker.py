@@ -17,25 +17,10 @@
 #   Add tests.
 #   Add mechanism (envvar, config file, ...) to set default data file
 
-"""
-Usage:
-    ./bp_tracker.py [-f <report_file>] -a systolic diastolic pulse
-    ./bp_tracker.py -h
-
-Options:
-    -a --add <sys> <diasys> <pulse>
-                Add three items of data: systolic & diastolic BP and
-                pulse rate. A mandatory option.
-    -f --file <report_file>   name of data file 
-                Modify code prn for specific users.
-                                [default: bp_numbers.txt]
-"""
-
 import argparse
 from datetime import datetime
 import os.path
 
-REPORT_FILE = 'bp_numbers.txt'
 
 
 def array_from_file(report_file):

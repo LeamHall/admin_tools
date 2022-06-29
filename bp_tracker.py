@@ -83,12 +83,19 @@ def list_high_low(l):
   """ Takes a numeric list and returns the highest and lowest entries. """
   return (min(l), max(l))
 
-report_file = "bp_numbers.txt" 
+report_file = "data/bp_numbers.txt"
 
 parser = argparse.ArgumentParser()
-parser.add_argument("-a", "--add", nargs=3, 
-  help = "Add in the order of systolic, diastolic, pulse")
-parser.add_argument("-f", "--file", help = "Report file")
+parser.add_argument(
+  "-a", "--add",
+  nargs=3,
+  help = "Add in the order of systolic, diastolic, pulse",
+  )
+parser.add_argument(
+  "-f", "--file",
+  help = "Report file (default data/bp_numbers.txt)",
+  default = "data/bp_numbers.txt",
+  )
 args    = parser.parse_args()
 
 if args.file:

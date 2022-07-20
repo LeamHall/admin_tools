@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # name:     httpd_server.py
 # version:  0.0.1
@@ -8,6 +8,18 @@
 
 ## NOTES
 # Defaults to localhost, port 8080
+# systemD notes from https://martinberoiz.org/2019/03/10/how-to-write-systemd-daemons-using-python/
+
+## Writing a systemD service
+# file: /etc/systemd/system/pyhttpd.service
+# [Unit]
+# Description=Python based HTTPD
+# After=network.target
+
+# [Service]
+# Type=simple
+# ExecStart=<rootdir>/httpd_server.py
+# Restart=on-failure
 
 
 from http.server import HTTPServer, BaseHTTPRequestHandler

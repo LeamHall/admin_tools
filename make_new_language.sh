@@ -54,53 +54,47 @@ fi
 
 make clean > ../logs/${language}_make_clean_${date}_${minute}.log 2>&1
 
-if [ -f ".git/config" ]
-then
-  git pull > ../logs/${language}_git_pull_${date}_${minute}.log 2>&1
-fi
-
-if [ "$language" == "ruby" ]
-then
-  if [ ! -f "tool/config.sub" ]
-  then
-    # Does the ruby pull from git have the config files?
-    #make update-config_files
-    autoconf > ../logs/${language}_autoconf_${date}_${minute}.log 2>&1
-  fi
-fi
-
-if [ "$language" == "perl" ]
-then
-  #./Configure -des -Dprefix=/usr/local -Dusedevel > ../logs/${language}_configure_${date}_${minute}.log 2>&1
-  ./Configure -des -Dprefix=/usr/local > ../logs/${language}_configure_${date}_${minute}.log 2>&1
-else
-  ./configure > ../logs/${language}_configure_${date}_${minute}.log 2>&1
-fi
-
-
-make > ../logs/${language}_make_${date}_${minute}.log 2>&1
-
-if [ "$language_base" == "php" ]
-then
-  make test > ../logs/${language}_make_test_${date}_${minute}.log 2>&1
-elif [ "$language_base" == "perl" ]
-then
-  # need to combine this with php above.
-  make test > ../logs/${language}_make_test_${date}_${minute}.log 2>&1
-else
-  make check > ../logs/${language}_make_check_${date}_${minute}.log 2>&1
-fi
+## Commented out for the nonce, what if a new branch is needed, or it's a fork?
+#if [ -f ".git/config" ]
+#then
+#  git pull > ../logs/${language}_git_pull_${date}_${minute}.log 2>&1
+#fi
 
 
 if [ "$language_base" == "autoconf" ]
 then
-  make installcheck > ../logs/${language}_make_installcheck_${date}_${minute}.log 2>&1
-elif [ "$language_base" == "perl" ]
+    ./configure > ../logs/${language}_configure_${date}_${minute}.log 2>&1
+    make > ../logs/${language}_make_${date}_${minute}.log 2>&1
+    make check > ../logs/${language}_make_check_${date}_${minute}.log 2>&1
+    make installcheck > ../logs/${language}_make_installcheck_${date}_${minute}.log 2>&1
+elif [ "$language_base" == "php" ]
 then
-  make install > ../logs/${language}_make_install_${date}_${minute}.log 2>&1
+    ./configure > ../logs/${language}_configure_${date}_${minute}.log 2>&1
+    make > ../logs/${language}_make_${date}_${minute}.log 2>&1
+    make test > ../logs/${language}_make_test_${date}_${minute}.log 2>&1
 elif [ "$language_base" == "ruby" ]
 then
-  make update-gems > ../logs/${language}_make_update-gems_${date}_${minute}.log 2>&1
-  make extract-gems > ../logs/${language}_make_extract-gems_${date}_${minute}.log 2>&1
+    if [ ! -f "tool/config.sub" ]
+    then
+        autoconf > ../logs/${language}_autoconf_${date}_${minute}.log 2>&1
+    fi
+    ./configure > ../logs/${language}_configure_${date}_${minute}.log 2>&1
+    make > ../logs/${language}_make_${date}_${minute}.log 2>&1
+    make check > ../logs/${language}_make_check_${date}_${minute}.log 2>&1
+    make update-gems > ../logs/${language}_make_update-gems_${date}_${minute}.log 2>&1
+    make extract-gems > ../logs/${language}_make_extract-gems_${date}_${minute}.log 2>&1
+elif [ "$language_base" == "perl" ]
+then
+  # need to combine this with php above.
+    ./Configure -des -Dprefix=/usr/local > ../logs/${language}_configure_${date}_${minute}.log 2>&1
+    make > ../logs/${language}_make_${date}_${minute}.log 2>&1
+    make test > ../logs/${language}_make_test_${date}_${minute}.log 2>&1
+elif [ "$language" == "cpython" ]
+then
+    make clean > ../logs/${language}_make_clean_${date}_${minute}.log 2>&1
+    ./configure --with-pydebug > ../logs/${language}_configure_with_pydebug_${date}_${minute}.log 2>&1
+    make -s > ../logs/${langauge}_make_s_${date}_${minute}.log 2>&1
+    make regen-global-objects > ../logs/${langauge}_make_regen_global_objects_${date}_${minute}.log 2>&1
+    ./python -m test > ../logs/${langauge}_python_m_test_${date}_${minute}.log 2>&1
+    make patchcheck > ../logs/${langauge}_make_patchcheck_${date}_${minute}.log 2>&1
 fi
-

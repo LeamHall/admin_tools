@@ -18,8 +18,8 @@
 
 # [Service]
 # Type=simple
-# ExecStart=<rootdir>/httpd_server.py
-# Restart=on-failure
+# ExecStart=<rootdir>/httpd_server.py &
+# Restart=always-failure
 
 
 from http.server import HTTPServer, BaseHTTPRequestHandler

@@ -32,3 +32,6 @@ then
   rsync -av /home/  /opt/external2/home
 fi
 
+# Ensure everything is written to disk.
+sync;sync
+

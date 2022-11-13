@@ -93,8 +93,8 @@ elif [ "$language" == "cpython" ]
 then
     make clean > ../logs/${language}_make_clean_${date}_${minute}.log 2>&1
     ./configure --with-pydebug > ../logs/${language}_configure_with_pydebug_${date}_${minute}.log 2>&1
-    make -s > ../logs/${langauge}_make_s_${date}_${minute}.log 2>&1
-    make regen-global-objects > ../logs/${langauge}_make_regen_global_objects_${date}_${minute}.log 2>&1
-    ./python -m test > ../logs/${langauge}_python_m_test_${date}_${minute}.log 2>&1
-    make patchcheck > ../logs/${langauge}_make_patchcheck_${date}_${minute}.log 2>&1
+    make -s > ../logs/${language}_make_s_${date}_${minute}.log 2>&1
+    make regen-global-objects > ../logs/${language}_make_regen_global_objects_${date}_${minute}.log 2>&1
+    ./python -m test > ../logs/${language}_python_m_test_${date}_${minute}.log 2>&1
+    make patchcheck > ../logs/${language}_make_patchcheck_${date}_${minute}.log 2>&1
 fi

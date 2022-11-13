@@ -54,11 +54,12 @@ fi
 
 make clean > ../logs/${language}_make_clean_${date}_${minute}.log 2>&1
 
-## Commented out for the nonce, what if a new branch is needed, or it's a fork?
-#if [ -f ".git/config" ]
-#then
-#  git pull > ../logs/${language}_git_pull_${date}_${minute}.log 2>&1
-#fi
+# Get the latest code. If a fork or different branch is needed, checkout that 
+#  branch first.
+if [ -f ".git/config" ]
+then
+  git pull > ../logs/${language}_git_pull_${date}_${minute}.log 2>&1
+fi
 
 
 if [ "$language_base" == "autoconf" ]

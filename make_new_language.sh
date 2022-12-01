@@ -22,20 +22,24 @@
 PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin
 export PATH
 
-language=$@
-if [ -d "$language" ]
-then
-  cd $language
-else
-  echo "Can't find $language."
-  exit
-fi
-
 language_base=`echo $language | awk -F'-' '{print $1}'`
 date=`date +%Y%m%d`
 minute=`date +%H%M`
 scriptname=`basename $0`
 self=`whoami`
+
+language=$@
+if [ -d "$language" ]
+then
+  cd $language
+  if [ -d '.git' ]
+    then
+      git pull > ../logs/${language}_git_pull_${date}_${minute}.log 2>&1 
+    fi
+else
+  echo "Can't find $language."
+  exit
+fi
 
 # Soft link make_new_language.sh to install_language.sh and
 #  run it as root to do the actual install.

@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 
-# name:     write_new_script.py
+# name:     write_new_code.py
 # version:  0.0.2
 # date:     20221201
 # author:   Leam Hall
 #
-# desc:     Write boilerplate script info into new script.
+# desc:     Write boilerplate info into new code.
 
 ## Usage:
-#  write_new_script.py  -f some_cool_script.py
+#  write_new_code.py  -f some_cool_code.py
 
 ## TODO
 # Add other languages.

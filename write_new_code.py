@@ -28,10 +28,12 @@ headers = {
 }
 
 languages = {
-    ".py":  { "exe": "#!/usr/bin/env python", "comment": "#"},
-    ".pl":  { "exe": "#!/usr/bin/env perl", "comment": "#"},
-    ".go":  { "exe": "", "comment": "//" },
-    ".c":   { "exe": "", "comment": "//"},
+    ".py":      { "exe": "#!/usr/bin/env python", "comment": "#"},
+    ".pl":      { "exe": "#!/usr/bin/env perl", "comment": "#"},
+    ".go":      { "exe": "", "comment": "//" },
+    ".c":       { "exe": "", "comment": "//"},
+    ".java":    { "exe": "", "comment": "//"},
+    ".sh":      { "exe": "#!/bin/bash", "comment": "#"},
 }
 
 header_order = ["name", "version", "date", "author", "desc"]

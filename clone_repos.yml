@@ -1,0 +1,79 @@
+---
+
+- name: base
+  ansible.builtin.git:
+    repo: "{{ item }}"
+    dest: "{{ repodir }}"
+  with_items: "{{ base }}"
+
+
+- name: MindPointGroup
+  ansible.builtin.git:
+    repo: "{{ item }}"
+    dest: "{{ repodir }}/MindPointGroup"
+  with_items: "{{ MindPointGroup }}"
+
+
+- name: shepdelacreme
+  ansible.builtin.git:
+    repo: "{{ item }}"
+    dest: "{{ repodir }}/shepdelacreme"
+  with_items: "{{ shepdelacreme }}"
+
+
+- name: LeamHall
+  ansible.builtin.git:
+    repo: "{{ item }}"
+    dest: "{{ repodir }}/LeamHall"
+  with_items: "{{ LeamHall }}"
+
+
+- name: LeamHall/archive
+  ansible.builtin.git:
+    repo: "{{ item }}"
+    dest: "{{ repodir }}/LeamHall/archive"
+  with_items: "{{ LeamHall/archive }}"
+
+
+- name: LeamHall/books
+  ansible.builtin.git:
+    repo: "{{ item }}"
+    dest: "{{ repodir }}/LeamHall/books"
+  with_items: "{{ LeamHall/books }}"
+
+
+- name: LeamHall/FreeTradeLeague
+  ansible.builtin.git:
+    repo: "{{ item }}"
+    dest: "{{ repodir }}/LeamHall/FreeTradeLeague"
+  with_items: "{{ LeamHall/FreeTradeLeague }}"
+
+
+- name: forks
+  ansible.builtin.git:
+    repo: "{{ item }}"
+    dest: "{{ repodir }}/forks"
+  with_items: "{{ forks }}"
+
+
+- name: makhidkarun
+  ansible.builtin.git:
+    repo: "{{ item }}"
+    dest: "{{ repodir }}/makhidkarun"
+  with_items: "{{ makhidkarun }}"
+
+
+- name: theunseenservant
+  ansible.builtin.git:
+    repo: "{{ item }}"
+    dest: "{{ repodir }}/theunseenservant"
+  with_items: "{{ theunseenservant }}"
+
+
+- name: docker
+  ansible.builtin.git:
+    repo: "{{ item }}"
+    dest: "{{ repodir }}/docker"
+  with_items: "{{ docker }}"
+
+

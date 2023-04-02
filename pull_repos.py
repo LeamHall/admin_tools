@@ -36,6 +36,14 @@ def name_stanza(name):
     result += "\n\n"
     return result
 
+def get_repo_dir(url):
+    """
+    Takes a standard git URL and returns the last section as the directory
+    """
+    url_parts = url[1].split('/')
+    base_dir    = url_parts[-1].replace('.git', '')
+    return base_dir
+
 for root, dirs, files in os.walk(base_dir):
     for d in dirs:
         if d == '.git':
@@ -52,16 +60,27 @@ for root, dirs, files in os.walk(base_dir):
             else:
                 repos[proj_dir][proj_repo] = url
 
-with open('git_repos.yml', 'w') as clone:
-    clone.write("---\n\n")
-    with open('clone_repos.yml', 'w') as names: 
-        names.write("---\n\n")
-        for k in repos.keys():
-            names.write(name_stanza(k))
-            clone.write("{}:\n".format(k))
-            for item in repos[k].items():
-                clone.write("  - '{}'\n".format(item[1]))
+with open('tmp/workstation.yml', 'w') as ws:
+    ws.write("---\n\n")
+    ws.write("repos:\n") 
+    for k in repos.keys():
+        for item in repos[k].items():
+            
+            repo_dir = get_repo_dir(item)
+            if k == 'base':
+                k = ''
+            ws.write("  - '{}' '{}' '{}' \n".format(k, item[1], repo_dir))
+
+with open('tmp/clone_repos.yml', 'w') as clone:
+    clone.write("---\n")
+    clone.write("- hosts:           workstations\n")
+    clone.write("  become:          false\n")
+    clone.write("  gather_facts:    false\n")
+    clone.write("\n\n")
+    clone.write("  tasks:\n")
+    clone.write("    - name: make_directories\n")
+    clone.write("      ansible.builtin.file:\n")
+    clone.write("        ")
 
 
-
-        
+    

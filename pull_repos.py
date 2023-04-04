@@ -9,8 +9,8 @@
 
 import os
 
-base_dir    = '/usr/local/src'
-repos       = {'base': {}}
+base_dir    = '/usr/local/src/'
+repos       = {'/': {}}
 
 
 def get_url(file):
@@ -56,21 +56,21 @@ for root, dirs, files in os.walk(base_dir):
             if len(proj_dir) and proj_dir not in repos.keys():
                 repos[proj_dir] = {}
             if len(proj_dir) == 0:
-                repos['base'][proj_repo] = url
+                repos['/'][proj_repo] = url
             else:
                 repos[proj_dir][proj_repo] = url
 
-with open('tmp/workstation.yml', 'w') as ws:
+with open('tmp/workstations.yml', 'w') as ws:
     ws.write("---\n\n")
     ws.write("repos:\n") 
     for k in repos.keys():
         for item in repos[k].items():
-            
             repo_dir = get_repo_dir(item)
-            if k == 'base':
-                k = ''
-            ws.write("  - '{}' '{}' '{}' \n".format(k, item[1], repo_dir))
+            if not k.startswith('/'):
+                k = "/{}".format(k)
+            ws.write("  - '{} {} {}' \n".format(k, item[1], repo_dir))
 
+"""
 with open('tmp/clone_repos.yml', 'w') as clone:
     clone.write("---\n")
     clone.write("- hosts:           workstations\n")
@@ -80,7 +80,11 @@ with open('tmp/clone_repos.yml', 'w') as clone:
     clone.write("  tasks:\n")
     clone.write("    - name: make_directories\n")
     clone.write("      ansible.builtin.file:\n")
-    clone.write("        ")
 
+   
+    for k in repos.keys():
+         
+    clone.write("        repo:  ")
 
+"""
     

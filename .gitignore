@@ -3,4 +3,5 @@ data/*
 logs/*
 *.swp
 tmp/*
+tmp
 

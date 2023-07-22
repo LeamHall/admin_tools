@@ -34,6 +34,7 @@ languages = {
     ".c":       { "exe": "", "comment": "//"},
     ".java":    { "exe": "", "comment": "//"},
     ".sh":      { "exe": "#!/bin/bash", "comment": "#"},
+    ".sql":     { "exe": "", "comment": "--"},
 }
 
 header_order = ["name", "version", "date", "author", "desc"]
@@ -57,7 +58,7 @@ with open(args.file, 'w') as file:
     if len(exe_line):
         file.write("{}\n\n".format(exe_line))
     for item in header_order:
-        file.write("{} {:8}:\t{}\n".format(comment, item, headers[item]))
+        file.write("{} {:8}:  {}\n".format(comment, item, headers[item]))
 
 chmod(args.file, 0o0750)
   

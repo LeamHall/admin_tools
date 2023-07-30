@@ -13,10 +13,14 @@
 
 ## CHANGELOG
 
+## TODO
+#   make logdir
+#
 PATH=/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/bin:/sbin
 export PATH
 
 base_dir='/usr/local/src/forks/'
+log_dir='../logs'
 language='cpython'
 full_dir="${base_dir}${language}"
 date=`date +%Y%m%d`
@@ -58,5 +62,15 @@ make regen-configure > ../logs/${language}_regen-configure_${timestamp}.log 2>&1
 ./configure --with-pydebug > ../logs/${language}_configure_${timestamp}.log 2>&1
 make -j > ../logs/${language}_make_j_${timestamp}.log 2>&1
 make regen-global-objects > ../logs/${language}_make_regen_global_objects_${timestamp}.log 2>&1
-./python -m test -uall -j0 > ../logs/${language}_python_m_test_${timestamp}.log 2>&1
+
+test_file="${log_dir}/${language}_python_m_test_${timestamp}.log"
+./python -m test -uall -j0 > $test_file 2>&1
+sleep 1
+tail -1 $test_file |grep 'SUCCESS' > /dev/null
+if [ $? -ne 0 ]
+then
+    echo "Failed tests, do not install"
+    exit 1
+fi
+
 make patchcheck > ../logs/${language}_make_patchcheck_${timestamp}.log 2>&1
